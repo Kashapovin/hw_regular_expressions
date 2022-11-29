@@ -2,7 +2,7 @@ import csv
 import re
 
 data = []
-with open('phonebook_raw.csv') as file:
+with open('phonebook_raw.csv', encoding='utf-8') as file:
     fields = file.readline().strip().split(',')
     reader = csv.DictReader(file, fieldnames=fields)
     for row in reader:
@@ -26,30 +26,21 @@ with open('phonebook_raw.csv') as file:
         if row['phone']:
             res = re.sub(phone_pattern, r'+7(\2)\3-\4-\5 \6', row['phone'])
             row['phone'] = res
+        row = {key: value for key, value in row.items() if key is not None}
         data.append(row)
 
 data = sorted(data, key=lambda i: i['lastname'])
-data1 = []
+data1 = data.copy()
 
 for i in range(1, len(data)):
     if data[i-1]['lastname'] == data[i]['lastname']:
         for key, value in data[i].items():
             data[i][key] = value if value else data[i-1][key]
-    data1.append(data[i])
-
-# for i in range(1, len(data)):
-#     if data[i - 1]['lastname'] == data[i]['lastname']:
-#         data[i]['lastname'] = data[i - 1]['lastname'] or data[i]['lastname']
-#         data[i]['firstname'] = data[i - 1]['firstname'] or data[i]['firstname']
-#         data[i]['surname'] = data[i - 1]['surname'] or data[i]['surname']
-#         data[i]['organization'] = data[i - 1]['organization'] or data[i]['organization']
-#         data[i]['position'] = data[i - 1]['position'] or data[i]['position']
-#         data[i]['phone'] = data[i - 1]['phone'] or data[i]['phone']
-#         data[i]['email'] = data[i - 1]['email'] or data[i]['email']
-#     data1.append(data[i])
+        data1.remove(data[i-1])
 
 print(data1)
 
-with open('phonebook_raw.csv') as file:
-    datawriter = csv.writer(file, delimiter=',')
+with open('phonebook.csv', 'w', encoding='utf-8', newline='') as file:
+    datawriter = csv.DictWriter(file, fieldnames=fields)
+    datawriter.writeheader()
     datawriter.writerows(data1)

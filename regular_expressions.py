@@ -40,7 +40,7 @@ for i in range(1, len(data)):
 
 print(data1)
 
-with open('phonebook.csv', 'w', encoding='utf-8', newline='') as file:
+with open('phonebook.csv', 'w', newline='') as file:
     datawriter = csv.DictWriter(file, fieldnames=fields)
     datawriter.writeheader()
     datawriter.writerows(data1)
